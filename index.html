@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Electronics - Light Bulbs, Circuits, Chargers & More</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --primary: #1a365d;
+            --secondary: #2a4365;
+            --accent: #4299e1;
+            --light: #ebf8ff;
+            --dark: #1a202c;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(26, 54, 93, 0.85), rgba(42, 67, 101, 0.9)), url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3') no-repeat center center/cover;
+            min-height: 80vh;
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .category-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 350px;
+            max-height: 500px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-container.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chatbot-messages {
+            background-color: white;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 350px;
+        }
+        
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-message {
+            align-items: flex-end;
+        }
+        
+        .bot-message {
+            align-items: flex-start;
+        }
+        
+        .message-bubble {
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message .message-bubble {
+            background-color: var(--accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message .message-bubble {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chatbot-input {
+            display: flex;
+            padding: 12px;
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 24px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chatbot-input input:focus {
+            border-color: var(--accent);
+        }
+        
+        .chatbot-input button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .chatbot-input button:hover {
+            background: #3182ce;
+        }
+        
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            padding: 10px 14px;
+            background-color: #f1f5f9;
+            border-radius: 18px;
+            width: 80px;
+            margin-bottom: 16px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #a0aec0;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .product-image {
+            background: linear-gradient(45deg, #e2e8f0, #f8fafc);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.1) 50%),
+                linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.1) 50%);
+            background-size: 20px 20px;
+            transform: rotate(45deg);
+            z-index: 1;
+        }
+        
+        .product-image i {
+            font-size: 4rem;
+            color: var(--primary);
+            z-index: 2;
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            color: var(--accent);
+        }
+        
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+        }
+        
+        .footer-link {
+            color: #cbd5e0;
+            transition: color 0.3s;
+        }
+        
+        .footer-link:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header text-white py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="bg-white text-blue-900 font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-3">SE</div>
+                <h1 class="logo text-2xl">SAMPLE ELECTRONICS</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="hover:text-blue-200 transition">Home</a>
+                <a href="#products" class="hover:text-blue-200 transition">Products</a>
+                <a href="#categories" class="hover:text-blue-200 transition">Categories</a>
+                <a href="#about" class="hover:text-blue-200 transition">About</a>
+                <a href="#contact" class="hover:text-blue-200 transition">Contact</a>
+            </nav>
+            <button class="md:hidden text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero flex items-center">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Electronics Solutions for Every Need</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">From light bulbs to complex circuits, we have everything for your electronic projects</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#products" class="btn btn-large">Explore Products</a>
+                <a href="#contact" class="btn btn-large bg-white text-blue-900 hover:bg-gray-100">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="products" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Featured Products</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">High-quality electronic components for hobbyists and professionals</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="product-card bg-white">
+                    <div class="product-image">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">LED Light Bulbs</h3>
+                        <p class="text-gray-600 mb-4">Energy-efficient LED bulbs in various colors and wattages for all your lighting needs.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg">$2.99</span>
+                            <button class="btn px-4 py-2 text-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card bg-white">
+                    <div class="product-image">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Microcontroller Kits</h3>
+                        <p class="text-gray-600 mb-4">Complete starter kits with Arduino, Raspberry Pi, and accessories for beginners.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg">$29.99</span>
+                            <button class="btn px-4 py-2 text-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card bg-white">
+                    <div class="product-image">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Power Adapters</h3>
+                        <p class="text-gray-600 mb-4">Universal chargers and power supplies for all your electronic devices.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg">$12.99</span>
+                            <button class="btn px-4 py-2 text-sm">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section id="categories" class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Product Categories</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Explore our wide range of electronic components and devices</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                <!-- Category 1 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Lighting</h3>
+                </div>
+                
+                <!-- Category 2 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Power</h3>
+                </div>
+                
+                <!-- Category 3 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">ICs & Chips</h3>
+                </div>
+                
+                <!-- Category 4 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Sensors</h3>
+                </div>
+                
+                <!-- Category 5 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Connectors</h3>
+                </div>
+                
+                <!-- Category 6 -->
+                <div class="category-card text-center p-6">
+                    <div class="category-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Motors</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="about" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Why Choose Sample Electronics?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">We provide high-quality electronic components with exceptional service</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="flex items-start">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Fast Shipping</h3>
+                        <p class="text-gray-600">Quick delivery to your doorstep with tracking information.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="flex items-start">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Quality Guarantee</h3>
+                        <p class="text-gray-600">All products tested for quality and performance.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="flex items-start">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Tech Support</h3>
+                        <p class="text-gray-600">Expert assistance for your electronic projects.</p>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="flex items-start">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Competitive Pricing</h3>
+                        <p class="text-gray-600">Best prices on high-quality electronic components.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="md:flex">
+                    <div class="md:w-1/2 bg-gradient-to-br from-blue-800 to-blue-600 text-white p-8">
+                        <h2 class="text-2xl font-bold mb-6">Get in Touch</h2>
+                        <p class="mb-6">Have questions about our products or need help with your project? Contact us today!</p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt mr-4 text-xl"></i>
+                                <span>123 Tech Street, Electronics District, CA 90210</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-phone mr-4 text-xl"></i>
+                                <span>+1 (234) 567-8900</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope mr-4 text-xl"></i>
+                                <span>info@sampleelectronics.com</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-4 text-xl"></i>
+                                <span>Mon-Fri: 9AM - 6PM, Sat: 10AM - 4PM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-1/2 p-8">
+                        <h3 class="text-xl font-bold mb-6">Send us a message</h3>
+                        <form class="contact-form">
+                            <input type="text" placeholder="Your Name" required>
+                            <input type="email" placeholder="Your Email" required>
+                            <input type="text" placeholder="Subject">
+                            <textarea rows="4" placeholder="Your Message" required></textarea>
+                            <button type="submit" class="btn w-full">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="bg-white text-blue-900 font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-3">SE</div>
+                        <h3 class="logo text-xl">SAMPLE ELECTRONICS</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Your trusted source for electronic components and solutions since 2010.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="footer-link hover:underline">Home</a></li>
+                        <li><a href="#products" class="footer-link hover:underline">Products</a></li>
+                        <li><a href="#categories" class="footer-link hover:underline">Categories</a></li>
+                        <li><a href="#about" class="footer-link hover:underline">About Us</a></li>
+                        <li><a href="#contact" class="footer-link hover:underline">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="footer-link hover:underline">Lighting</a></li>
+                        <li><a href="#" class="footer-link hover:underline">Power Supplies</a></li>
+                        <li><a href="#" class="footer-link hover:underline">Microcontrollers</a></li>
+                        <li><a href="#" class="footer-link hover:underline">Sensors</a></li>
+                        <li><a href="#" class="footer-link hover:underline">Motors</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe to get updates on new products and special offers.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l-lg focus:outline-none text-gray-800">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+                <p>&copy; 2023 Sample Electronics. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Toggle Button -->
+    <div class="chat-toggle" id="chatToggle">
+        <i class="fas fa-comment-dots text-2xl"></i>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="flex items-center">
+                <div class="bg-white text-blue-900 font-bold w-8 h-8 rounded-full flex items-center justify-center mr-3">SE</div>
+                <div>
+                    <h3 class="font-bold">ElectroBot</h3>
+                    <p class="text-xs opacity-80">Sample Electronics Assistant</p>
+                </div>
+            </div>
+            <button id="closeChat" class="text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-bubble">
+                    Hello! I'm ElectroBot, your Sample Electronics assistant. How can I help you today?
+                </div>
+            </div>
+            <div class="message bot-message">
+                <div class="message-bubble">
+                    You can ask me about our products like light bulbs, circuits, chargers, switches, motors, and sensors.
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-input">
+            <input type="text" id="userInput" placeholder="Type your question here...">
+            <button id="sendMessage">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatToggle = document.getElementById('chatToggle');
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            const closeChat = document.getElementById('closeChat');
+            const userInput = document.getElementById('userInput');
+            const sendMessage = document.getElementById('sendMessage');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Show chatbot after 3 seconds
+            setTimeout(() => {
+                chatbotContainer.classList.add('active');
+            }, 3000);
+            
+            // Toggle chatbot visibility
+            chatToggle.addEventListener('click', () => {
+                chatbotContainer.classList.add('active');
+            });
+            
+            // Close chatbot
+            closeChat.addEventListener('click', () => {
+                chatbotContainer.classList.remove('active');
+            });
+            
+            // Send message function
+            function sendMessageHandler() {
+                const message = userInput.value.trim();
+                if (message) {
+                    // Add user message to chat
+                    addMessage(message, 'user');
+                    userInput.value = '';
+                    
+                    // Show typing indicator
+                    showTypingIndicator();
+                    
+                    // Process the message and respond
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        processUserMessage(message);
+                    }, 1500);
+                }
+            }
+            
+            // Event listeners for sending messages
+            sendMessage.addEventListener('click', sendMessageHandler);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessageHandler();
+                }
+            });
+            
+            // Add message to chat
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender + '-message');
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.classList.add('message-bubble');
+                bubbleDiv.textContent = text;
+                
+                messageDiv.appendChild(bubbleDiv);
+                chatMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Show typing indicator
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.classList.add('typing-indicator');
+                typingDiv.id = 'typingIndicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('typing-dot');
+                    typingDiv.appendChild(dot);
+                }
+                
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            // Process user message and generate response
+            function processUserMessage(message) {
+                const lowerMessage = message.toLowerCase();
+                let response = "I'm not sure about that. You can call us at +1 (234) 567-8900 for more information.";
+                
+                // Simple keyword-based responses
+                if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                    response = "Hello! How can I assist you with our electronic products today?";
+                } else if (lowerMessage.includes('light') || lowerMessage.includes('bulb')) {
+                    response = "We offer a wide range of LED light bulbs in various colors and wattages. They're energy-efficient and long-lasting. Would you like to know about a specific type?";
+                } else if (lowerMessage.includes('circuit') || lowerMessage.includes('board')) {
+                    response = "We have printed circuit boards (PCBs), breadboards, and development boards for various microcontrollers. Perfect for prototyping your electronic projects!";
+                } else if (lowerMessage.includes('charger') || lowerMessage.includes('power')) {
+                    response = "Our power adapters and chargers support various devices. We have USB chargers, wall adapters, and power banks. What device do you need to charge?";
+                } else if (lowerMessage.includes('switch') || lowerMessage.includes('button')) {
+                    response = "We stock tactile switches, toggle switches, push buttons, and slide switches in various configurations. Perfect for controlling your electronic circuits!";
+                } else if (lowerMessage.includes('motor')) {
+                    response = "We offer DC motors, servo motors, and stepper motors for all your robotics and automation projects. What type of motor are you looking for?";
+                } else if (lowerMessage.includes('sensor')) {
+                    response = "Our sensor collection includes temperature sensors, motion sensors, light sensors, and many more. They're great for IoT and automation projects!";
+                } else if (lowerMessage.includes('thank')) {
+                    response = "You're welcome! Is there anything else I can help you with?";
+                } else if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('call')) {
+                    response = "You can reach us at +1 (234) 567-8900 during business hours. We're happy to assist you!";
+                } else if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('buy')) {
+                    response = "Prices vary by product. You can check our product pages for specific pricing or call us at +1 (234) 567-8900 for a quote.";
+                } else if (lowerMessage.includes('hours') || lowerMessage.includes('open')) {
+                    response = "We're open Monday to Friday from 9AM to 6PM and Saturday from 10AM to 4PM. We're closed on Sundays.";
+                }
+                
+                addMessage(response, 'bot');
+            }
+        });
+    </script>
+</body>
+</html>
